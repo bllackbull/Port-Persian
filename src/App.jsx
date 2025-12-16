@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   User,
@@ -16,7 +17,7 @@ import {
   Star,
   Shirt,
   Book,
-  Home,
+  Home as HomeIcon,
   Dumbbell,
   Sparkles,
   Smartphone,
@@ -25,15 +26,23 @@ import {
   Heart,
   Gem,
   Gamepad2,
+  Check,
 } from "lucide-react";
+import Cart from "./Cart.jsx";
 
-export default function App() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [language, setLanguage] = useState("EN");
+function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart }) {
+  const navigate = useNavigate();
   const [bannerIndex, setBannerIndex] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [addedItemId, setAddedItemId] = useState(null);
   const closeTimeoutRef = useRef(null);
+
+  const addToCart = useCallback((item) => {
+    setCart(prevCart => [...prevCart, item]);
+    setAddedItemId(item.id);
+    setTimeout(() => setAddedItemId(null), 2000);
+  }, [setCart]);
 
   useEffect(() => {
     if (darkMode) {
@@ -42,6 +51,12 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    const handleScroll = () => setDropdownOpen(false);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const banners = [
     "https://via.placeholder.com/1400x400?text=Banner+1",
@@ -83,7 +98,7 @@ export default function App() {
         ],
       },
       "Home & Garden": {
-        icon: <Home size={20} />,
+        icon: <HomeIcon size={20} />,
         subcategories: [
           { name: "Furniture", subsubs: ["Sofas", "Tables", "Chairs", "Beds"] },
           { name: "Decor", subsubs: ["Paintings", "Vases", "Candles", "Mirrors"] },
@@ -176,7 +191,9 @@ export default function App() {
     Object.entries(categoryData).forEach(([cat, data]) => {
       data.items = Array.from({ length: 12 }, (_, i) => {
         const discount = Math.random() > 0.4 ? Math.floor(Math.random() * 40) + 10 : null;
-        const item = { id: idCounter++, discount };
+        const originalPrice = Math.floor(Math.random() * 100) + 10;
+        const price = discount ? (originalPrice * (1 - discount / 100)).toFixed(2) : originalPrice;
+        const item = { id: idCounter++, name: `${cat} Product ${i + 1}`, price: parseFloat(price), originalPrice, discount };
         if (discount) allDiscounted.push(item);
         return item;
       });
@@ -253,24 +270,29 @@ export default function App() {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setLanguage(language === "EN" ? "FA" : "EN")}
-                className="flex items-center space-x-1 px-3 py-2 rounded-lg border hover:bg-gray-100"
+                className={`flex items-center space-x-1 px-3 py-2 rounded-lg border ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
               >
                 <Globe size={18} /> <span>{language}</span>
               </button>
 
               <button
                 onClick={() => setDarkMode(!darkMode)}
-                className="p-2 rounded-lg border hover:bg-gray-100"
+                className={`p-2 rounded-lg border ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
               >
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
 
-              <button className="p-2 rounded-lg border hover:bg-gray-100">
+              <button className={`p-2 rounded-lg border ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
                 <User size={20} />
               </button>
 
-              <button className="p-2 rounded-lg border hover:bg-gray-100">
+              <button onClick={() => navigate('/cart')} className={`relative p-2 rounded-lg border ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}>
                 <ShoppingCart size={20} />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cart.length}
+                  </span>
+                )}
               </button>
             </div>
           </div>
@@ -278,15 +300,15 @@ export default function App() {
           {/* Categories Row */}
           <div className="mt-4 flex items-center relative">
             <div className="relative">
-              <button onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); setDropdownOpen(true); }} onMouseLeave={() => { closeTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 200); }} className="flex items-center font-bold px-4 py-2 whitespace-nowrap hover:bg-gray-100 rounded-full">
+              <button onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); setDropdownOpen(true); }} onMouseLeave={() => { closeTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 200); }} className={`flex items-center font-bold px-4 py-2 whitespace-nowrap ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'} rounded-full`}>
                 <Menu size={20} className="mr-2" /> All Categories{" "}
                 <ChevronDown size={16} className="ml-1" />
               </button>
               {/* Dropdown on hover */}
-              <div className={`fixed top-32 left-0 w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'} rounded shadow-lg ${dropdownOpen ? 'opacity-100' : 'opacity-0'} transition-opacity pointer-events-auto z-50 flex`} onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); }} onMouseLeave={() => setDropdownOpen(false)}>
+              <div className={`fixed top-32 left-0 w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'} rounded shadow-lg ${dropdownOpen ? 'opacity-100' : 'opacity-0'} transition-opacity ${dropdownOpen ? 'pointer-events-auto' : 'pointer-events-none'} z-50 flex`} onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); }} onMouseLeave={() => { closeTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 200); }}>
                 <div className="w-1/4">
                   {Object.keys(orderedCategories).filter(cat => cat !== "Hot Deals" && cat !== "Most Popular").map(cat => (
-                    <div key={cat} onMouseEnter={() => { setHoveredCategory(cat); }} className={`font-bold flex items-center px-4 py-2 cursor-pointer w-full hover:bg-gray-200 min-h-10`}>
+                    <div key={cat} onMouseEnter={() => { setHoveredCategory(cat); }} className={`font-bold flex items-center px-4 py-2 cursor-pointer w-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} min-h-10`}>
                       {orderedCategories[cat].icon} <span className="ml-2">{cat}</span>
                     </div>
                   ))}
@@ -297,12 +319,12 @@ export default function App() {
                       <div className="grid grid-cols-3 gap-4">
                         {orderedCategories[hoveredCategory].subcategories.map(sub => (
                           <div key={sub.name} className="mb-2">
-                            <div className={`px-4 py-1 cursor-pointer hover:bg-gray-200 font-bold`}>
+                            <div className={`px-4 py-1 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} font-bold`}>
                               {sub.name}
                             </div>
                             <div className="ml-4">
                               {sub.subsubs.map(subsub => (
-                                <div key={subsub} className={`px-4 py-1 cursor-pointer hover:bg-gray-200 text-sm`}>
+                                <div key={subsub} className={`px-4 py-1 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} text-sm`}>
                                   {subsub}
                                 </div>
                               ))}
@@ -372,8 +394,6 @@ export default function App() {
                 </div>
                 <div className="flex overflow-x-auto space-x-4 pb-2 scrollbar-custom">
                   {data.items.map((item) => {
-                    const originalPrice = 19.99;
-                    const discountedPrice = item.discount ? (originalPrice * (1 - item.discount / 100)).toFixed(2) : originalPrice;
                     return (
                       <div
                         key={item.id}
@@ -397,23 +417,30 @@ export default function App() {
                             </span>
                           )}
                         </div>
-                        <h3 className="text-lg font-semibold mb-1">
-                          Product {item.id}
+                        <h3 className="text-base font-semibold mb-1 truncate">
+                          {item.name}
                         </h3>
                         <div className="flex justify-between items-end min-h-[3rem]">
                           <div>
                             <p className={`text-lg font-bold ${item.discount ? 'text-red-500' : ''}`}>
-                              ${discountedPrice}
+                              ${item.price}
                             </p>
                             {item.discount && (
-                              <p className="text-sm text-gray-500 line-through">${originalPrice}</p>
+                              <p className="text-sm text-gray-500 line-through">${item.originalPrice}</p>
                             )}
                           </div>
-                          <button className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition">
-                            <ShoppingCart
-                              size={18}
-                              className={darkMode ? "" : "text-white"}
-                            />
+                          <button
+                            onClick={() => addToCart(item)}
+                            className={`px-4 py-2 rounded transition ${item.id === addedItemId ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                          >
+                            {item.id === addedItemId ? (
+                              <Check size={18} className={darkMode ? "" : "text-white"} />
+                            ) : (
+                              <ShoppingCart
+                                size={18}
+                                className={darkMode ? "" : "text-white"}
+                              />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -452,5 +479,20 @@ export default function App() {
         </footer>
       </div>
     </>
+  );
+}
+
+export default function App() {
+  const [darkMode, setDarkMode] = useState(false);
+  const [language, setLanguage] = useState("EN");
+  const [cart, setCart] = useState([]);
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home key="home" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} setCart={setCart} />} />
+        <Route path="/cart" element={<Cart key="cart" cart={cart} setCart={setCart} darkMode={darkMode} />} />
+      </Routes>
+    </Router>
   );
 }
