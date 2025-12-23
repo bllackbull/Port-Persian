@@ -43,7 +43,7 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
     <div className={`min-h-screen flex flex-col overflow-hidden ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} orderedCategories={orderedCategories} />
 
-      <div className="flex-1 pt-24 md:pt-36 px-2 md:px-6 overflow-hidden">
+      <div className="flex-1 pt-24 md:pt-36 px-4 md:px-6 overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           {loading ? (
             <div className="flex items-center gap-4">
@@ -52,7 +52,7 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <button aria-label="Back" onClick={() => navigate(-1)} className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-white hover:bg-gray-100 text-black'}`}>
+              <button aria-label="Back" onClick={() => navigate(-1)} className={`hidden md:inline-flex p-2 rounded-lg border ${darkMode ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-white hover:bg-gray-100 text-black'}`}>
                 <ArrowLeft size={18} />
               </button>
               <h1 className="text-3xl font-bold">Shopping Cart</h1>

@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Globe, Sun, Moon, Menu, User, ShoppingCart, ChevronDown, Home as HomeIcon, X } from 'lucide-react';
+import { Search, Globe, Sun, Moon, Menu, User, ShoppingCart, ChevronDown, ChevronRight, Home as HomeIcon, X, ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 export default function Navbar({ darkMode, setDarkMode, language, setLanguage, cart, orderedCategories }) {
@@ -11,6 +11,70 @@ export default function Navbar({ darkMode, setDarkMode, language, setLanguage, c
   const [mobilePanel, setMobilePanel] = useState(null); // 'menu' | 'search' | null
   const [mobileCategory, setMobileCategory] = useState(null);
   const closeTimeoutRef = useRef(null);
+  const categoriesRef = useRef(null);
+  const scrollLockRef = useRef(0);
+
+  const navigateToSection = (cat) => {
+    const id = cat.replace(/\s+/g, "-").toLowerCase();
+    // close panels and navigate home, then scroll to section
+    setMobilePanel(null);
+    setMobileCategory(null);
+    navigate('/');
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  };
+
+  // Robustly lock background scrolling when mobile overlays are open while still allowing the categories list to scroll
+  useEffect(() => {
+    const open = mobilePanel === 'menu' || mobilePanel === 'search' || !!mobileCategory;
+
+    const prevent = (e) => {
+      // allow scroll if the event target is inside the categories list
+      if (categoriesRef.current && e.target && categoriesRef.current.contains(e.target)) return;
+      e.preventDefault();
+    };
+
+    if (open) {
+      // save scroll position and lock body in place (better for mobile)
+      scrollLockRef.current = window.scrollY || 0;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollLockRef.current}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+
+      // block touch/wheel events except inside categories list
+      document.addEventListener('touchmove', prevent, { passive: false });
+      document.addEventListener('wheel', prevent, { passive: false });
+    } else {
+      // restore scroll
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      window.scrollTo(0, scrollLockRef.current || 0);
+
+      document.removeEventListener('touchmove', prevent);
+      document.removeEventListener('wheel', prevent);
+    }
+
+    // cleanup
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      document.removeEventListener('touchmove', prevent);
+      document.removeEventListener('wheel', prevent);
+    };
+  }, [mobilePanel, mobileCategory]);
 
   return (
     <>
@@ -142,7 +206,7 @@ export default function Navbar({ darkMode, setDarkMode, language, setLanguage, c
 
     {/* Mobile menu panel (menu) - moved out of nav to ensure it's above the bottom tab bar */}
     {mobilePanel === 'menu' && (
-      <div className={`fixed inset-0 z-[9999] ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <div className={`fixed inset-0 z-[99999] md:hidden ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`} style={{ touchAction: 'none', isolation: 'isolate' }}>
         <div className="p-4 flex items-center justify-between border-b">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobilePanel(null)} className="p-2 rounded-lg border" aria-label="Close menu">
@@ -151,27 +215,34 @@ export default function Navbar({ darkMode, setDarkMode, language, setLanguage, c
             <span className="font-bold">Menu</span>
           </div>
           <div className="flex items-center gap-2">
+            <button onClick={() => { setDarkMode(!darkMode); }} className="p-2 rounded-lg border" aria-label="Toggle dark mode">{darkMode ? <Sun size={18} /> : <Moon size={18} />}</button>
             <button onClick={() => { setLanguage(language === 'EN' ? 'FA' : 'EN'); }} className="p-2 rounded-lg border"><Globe size={18} /></button>
           </div>
         </div>
 
-        <div className="p-4 space-y-4 overflow-y-auto h-full">
-          <div className="mt-4">
-            <h3 className="font-semibold mb-2">Categories</h3>
-            <ul className="space-y-2">
-              {Object.entries(orderedCategories).map(([cat, data]) => (
-                <li key={cat}>
-                  <button onClick={() => { setMobileCategory(cat); }} className="w-full flex items-center justify-between p-3 rounded border">
-                    <div className="flex items-center"><span className="mr-3">{data.icon}</span><span>{cat}</span></div>
-                    <ChevronDown size={16} />
-                  </button>
-                </li>
-              ))}
-            </ul>
+        <div className="flex flex-col h-full">
+          <div ref={categoriesRef} className="p-4 flex-1 overflow-y-auto overscroll-contain mobile-categories-scroll" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
+            <div className="mt-4">
+              <h3 className="font-semibold mb-2">Categories</h3>
+              <ul className="space-y-2">
+                {Object.entries(orderedCategories).filter(([cat]) => cat !== 'Hot Deals' && cat !== 'Most Popular').map(([cat, data]) => (
+                  <li key={cat}>
+                    <button onClick={() => { setMobileCategory(cat); }} className="w-full flex items-center justify-between p-3 rounded border">
+                      <div className="flex items-center"><span className="mr-3">{data.icon}</span><span>{cat}</span></div>
+                      <ChevronRight size={16} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          <div className="mt-6 space-y-3">
-            <button className="w-full p-3 rounded border">Account</button>
+          <div className="p-4 border-t flex items-center justify-between">
+            <div />
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setDarkMode(!darkMode); }} className="p-2 rounded-lg border" aria-label="Toggle dark mode">{darkMode ? <Sun size={18} /> : <Moon size={18} />}</button>
+              <button onClick={() => { setLanguage(language === 'EN' ? 'FA' : 'EN'); }} className="p-2 rounded-lg border"><Globe size={18} /></button>
+            </div>
           </div>
         </div>
       </div>
@@ -179,58 +250,71 @@ export default function Navbar({ darkMode, setDarkMode, language, setLanguage, c
 
     {/* Mobile category overlay (layers above tab bar) - moved out so it can appear above tabs */}
     {mobileCategory && (
-      <div className={`fixed inset-0 z-[10000] ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} p-4`}>
+      <div className={`fixed inset-0 z-[100000] md:hidden ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} p-4`} style={{ isolation: 'isolate' }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileCategory(null)} className="p-2 rounded-lg border">Back</button>
+            <button aria-label="Back" onClick={() => setMobileCategory(null)} className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-white hover:bg-gray-100 text-black'}`}>
+              <ArrowLeft size={18} />
+            </button>
             <h3 className="font-bold">{mobileCategory}</h3>
           </div>
           <div />
         </div>
         <div className="overflow-y-auto">
-          {orderedCategories[mobileCategory] && orderedCategories[mobileCategory].subcategories.map((sub, idx) => (
+          {orderedCategories && orderedCategories[mobileCategory] && Array.isArray(orderedCategories[mobileCategory].subcategories) ? orderedCategories[mobileCategory].subcategories.map((sub, idx) => (
             <div key={idx} className="mb-3">
               <div className={`px-3 py-2 rounded border ${darkMode ? 'border-gray-700' : ''}`}>{sub.name}</div>
               <div className="ml-4 mt-2 space-y-1">
-                {sub.subsubs.map(s => (
+                {Array.isArray(sub.subsubs) ? sub.subsubs.map(s => (
                   <button key={s} className="w-full text-left text-sm p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">{s}</button>
-                ))}
+                )) : null}
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="text-sm text-gray-500">No categories found.</div>
+          )}
         </div>
       </div>
     )}
 
     {/* Mobile search panel (layers under tab bar) */}
     {mobilePanel === 'search' && (
-      <div className={`fixed inset-0 z-[9998] ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
-        <div className="p-4 border-b">
+      <div className={`fixed left-0 right-0 bottom-0 z-40 md:hidden ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`} style={{ touchAction: 'none', isolation: 'isolate', top: '4rem' }}>
+        <div className="p-4" style={{ touchAction: 'pan-y' }}>
           <input autoFocus className={`w-full px-3 py-2 rounded border ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-100 border-gray-300 text-black'}`} placeholder="Search..." />
         </div>
-        <div className="p-4">{/* empty full-screen body */}</div>
+        <div className="p-4 pb-24">
+          {/* Tags / quick links under search */}
+          <div className="flex flex-wrap gap-2">
+            {orderedCategories && Object.keys(orderedCategories).slice(0, 12).map(tag => (
+              <button key={tag} onClick={() => navigateToSection(tag)} className={`flex items-center px-2 py-1 rounded-full border border-blue-600 text-blue-600 text-sm hover:bg-blue-100 ${darkMode ? 'bg-gray-800 text-blue-300 border-blue-600' : ''}`}>
+                <span className="mr-2">{orderedCategories[tag] && orderedCategories[tag].icon}</span>
+                <span>{tag}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     )}
 
-    {/* Mobile bottom tab bar (visible on phones) */}
-    <div className="fixed left-4 right-4 bottom-16 md:hidden z-50">
+    <div className="fixed left-4 right-4 bottom-6 md:hidden z-50">
       <div className={`${darkMode ? 'bg-gray-900 text-white border' : 'bg-white text-black border'} rounded-xl shadow px-2 py-2 flex`}>
-        <button onClick={() => navigate('/')} className={`flex-1 flex flex-col items-center justify-center text-sm ${location.pathname === '/' ? (darkMode ? 'bg-blue-900 text-white font-bold rounded-md' : 'bg-blue-100 text-blue-600 font-bold rounded-md') : ''}`}>
+        <button onClick={() => { setMobilePanel(null); navigate('/'); }} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${location.pathname === '/' && mobilePanel !== 'search' ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
           <HomeIcon size={18} />
           <span className="text-xs mt-1">Home</span>
         </button>
-        <button onClick={() => setMobilePanel('search')} className="flex-1 flex flex-col items-center justify-center text-sm">
+        <button onClick={() => setMobilePanel('search')} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${mobilePanel === 'search' ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
           <Search size={18} />
           <span className="text-xs mt-1">Search</span>
         </button>
-        <button onClick={() => { if (location.pathname !== '/cart') navigate('/cart'); }} className={`flex-1 flex flex-col items-center justify-center text-sm relative ${location.pathname === '/cart' ? (darkMode ? 'bg-blue-900 text-white font-bold rounded-md' : 'bg-blue-100 text-blue-600 font-bold rounded-md') : ''}`}>
+        <button onClick={() => { setMobilePanel(null); setMobileCategory(null); if (location.pathname !== '/cart') navigate('/cart'); }} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 relative focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${(location.pathname === '/cart' && mobilePanel !== 'search') ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
           <ShoppingCart size={18} />
           <span className="text-xs mt-1">Cart</span>
           {cart.length > 0 && (
             <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{cart.length}</span>
           )}
         </button>
-        <button className="flex-1 flex flex-col items-center justify-center text-sm">
+        <button className="flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300">
           <User size={18} />
           <span className="text-xs mt-1">Account</span>
         </button>
