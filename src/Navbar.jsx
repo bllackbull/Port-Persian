@@ -28,7 +28,7 @@ export default function Navbar({ darkMode, setDarkMode, language, setLanguage, c
 
   // Robustly lock background scrolling when mobile overlays are open while still allowing the categories list to scroll
   useEffect(() => {
-    const open = mobilePanel === 'menu' || mobilePanel === 'search' || !!mobileCategory;
+    const open = mobilePanel === 'menu' || !!mobileCategory;
 
     const prevent = (e) => {
       // allow scroll if the event target is inside the categories list
@@ -149,59 +149,61 @@ export default function Navbar({ darkMode, setDarkMode, language, setLanguage, c
       </div>
 
       {/* Categories Row */}
-      <div className="mt-4 flex items-center relative hidden md:flex">
-        <div className="relative">
-          <button onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); setDropdownOpen(true); }} onMouseLeave={() => { closeTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 200); }} className={`flex items-center font-bold px-4 py-2 whitespace-nowrap ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'} rounded-full`}>
-            <Menu size={20} className="mr-2" /> All Categories{" "}
-            <ChevronDown size={16} className="ml-1" />
-          </button>
-          {/* Dropdown on hover */}
-          <div className={`fixed top-32 left-0 w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'} rounded shadow-lg ${dropdownOpen ? 'opacity-100' : 'opacity-0'} transition-opacity ${dropdownOpen ? 'pointer-events-auto' : 'pointer-events-none'} z-50 flex`} onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); }} onMouseLeave={() => { closeTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 200); }}>
-            <div className="w-1/4">
-              {Object.keys(orderedCategories).filter(cat => cat !== "Hot Deals" && cat !== "Most Popular").map(cat => (
-                <div key={cat} onMouseEnter={() => { setHoveredCategory(cat); }} className={`font-bold flex items-center px-4 py-2 cursor-pointer w-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} min-h-10`}>
-                  {orderedCategories[cat].icon} <span className="ml-2">{cat}</span>
-                </div>
-              ))}
-            </div>
-            <div className="w-3/4 border-l border-gray-300">
-              {hoveredCategory && (
-                <div>
-                  <div className="grid grid-cols-3 gap-4">
-                    {orderedCategories[hoveredCategory].subcategories.map(sub => (
-                      <div key={sub.name} className="mb-2">
-                        <div className={`px-4 py-1 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} font-bold`}>
-                          {sub.name}
-                        </div>
-                        <div className="ml-4">
-                          {sub.subsubs.map(subsub => (
-                            <div key={subsub} className={`px-4 py-1 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} text-sm`}>
-                              {subsub}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+      {location.pathname !== '/search' && (
+        <div className="mt-4 flex items-center relative hidden md:flex">
+          <div className="relative">
+            <button onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); setDropdownOpen(true); }} onMouseLeave={() => { closeTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 200); }} className={`flex items-center font-bold px-4 py-2 whitespace-nowrap ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'} rounded-full`}>
+              <Menu size={20} className="mr-2" /> All Categories{" "}
+              <ChevronDown size={16} className="ml-1" />
+            </button>
+            {/* Dropdown on hover */}
+            <div className={`fixed top-32 left-0 w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border ${darkMode ? 'border-gray-700' : 'border-gray-300'} rounded shadow-lg ${dropdownOpen ? 'opacity-100' : 'opacity-0'} transition-opacity ${dropdownOpen ? 'pointer-events-auto' : 'pointer-events-none'} z-50 flex`} onMouseEnter={() => { if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current); }} onMouseLeave={() => { closeTimeoutRef.current = setTimeout(() => setDropdownOpen(false), 200); }}>
+              <div className="w-1/4">
+                {Object.keys(orderedCategories).filter(cat => cat !== "Hot Deals" && cat !== "Most Popular").map(cat => (
+                  <div key={cat} onMouseEnter={() => { setHoveredCategory(cat); }} className={`font-bold flex items-center px-4 py-2 cursor-pointer w-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} min-h-10`}>
+                    {orderedCategories[cat].icon} <span className="ml-2">{cat}</span>
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
+              <div className="w-3/4 border-l border-gray-300">
+                {hoveredCategory && (
+                  <div>
+                    <div className="grid grid-cols-3 gap-4">
+                      {orderedCategories[hoveredCategory].subcategories.map(sub => (
+                        <div key={sub.name} className="mb-2">
+                          <div className={`px-4 py-1 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} font-bold`}>
+                            {sub.name}
+                          </div>
+                          <div className="ml-4">
+                            {sub.subsubs.map(subsub => (
+                              <div key={subsub} className={`px-4 py-1 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'} text-sm`}>
+                                {subsub}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="w-px h-6 bg-gray-400 mx-2" />
+          <div className="w-px h-6 bg-gray-400 mx-2" />
 
-        <div className="flex space-x-1 overflow-x-auto">
-          {Object.entries(orderedCategories).map(([cat, data]) => (
-            <span
-              key={cat}
-              className="flex items-center px-2 py-1 rounded-full border border-blue-600 text-blue-600 cursor-pointer hover:bg-blue-100 whitespace-nowrap text-sm"
-            >
-              {data.icon} <span className="ml-1">{cat}</span>
-            </span>
-          ))}
+          <div className="flex space-x-1 overflow-x-auto">
+            {Object.entries(orderedCategories).map(([cat, data]) => (
+              <span
+                key={cat}
+                className="flex items-center px-2 py-1 rounded-full border border-blue-600 text-blue-600 cursor-pointer hover:bg-blue-100 whitespace-nowrap text-sm"
+              >
+                {data.icon} <span className="ml-1">{cat}</span>
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </nav>
 
     {/* Mobile menu panel (menu) - moved out of nav to ensure it's above the bottom tab bar */}
@@ -277,37 +279,17 @@ export default function Navbar({ darkMode, setDarkMode, language, setLanguage, c
       </div>
     )}
 
-    {/* Mobile search panel (layers under tab bar) */}
-    {mobilePanel === 'search' && (
-      <div className={`fixed left-0 right-0 bottom-0 z-40 md:hidden ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`} style={{ touchAction: 'none', isolation: 'isolate', top: '4rem' }}>
-        <div className="p-4" style={{ touchAction: 'pan-y' }}>
-          <input autoFocus className={`w-full px-3 py-2 rounded border ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-100 border-gray-300 text-black'}`} placeholder="Search..." />
-        </div>
-        <div className="p-4 pb-24">
-          {/* Tags / quick links under search */}
-          <div className="flex flex-wrap gap-2">
-            {orderedCategories && Object.keys(orderedCategories).slice(0, 12).map(tag => (
-              <button key={tag} onClick={() => navigateToSection(tag)} className={`flex items-center px-2 py-1 rounded-full border border-blue-600 text-blue-600 text-sm hover:bg-blue-100 ${darkMode ? 'bg-gray-800 text-blue-300 border-blue-600' : ''}`}>
-                <span className="mr-2">{orderedCategories[tag] && orderedCategories[tag].icon}</span>
-                <span>{tag}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    )}
-
     <div className="fixed left-4 right-4 bottom-6 md:hidden z-50">
       <div className={`${darkMode ? 'bg-gray-900 text-white border' : 'bg-white text-black border'} rounded-xl shadow px-2 py-2 flex`}>
-        <button onClick={() => { setMobilePanel(null); navigate('/'); }} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${location.pathname === '/' && mobilePanel !== 'search' ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
+        <button onClick={() => { setMobilePanel(null); navigate('/'); }} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${location.pathname === '/' ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
           <HomeIcon size={18} />
           <span className="text-xs mt-1">Home</span>
         </button>
-        <button onClick={() => setMobilePanel('search')} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${mobilePanel === 'search' ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
+        <button onClick={() => navigate('/search')} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${location.pathname === '/search' ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
           <Search size={18} />
           <span className="text-xs mt-1">Search</span>
         </button>
-        <button onClick={() => { setMobilePanel(null); setMobileCategory(null); if (location.pathname !== '/cart') navigate('/cart'); }} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 relative focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${(location.pathname === '/cart' && mobilePanel !== 'search') ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
+        <button onClick={() => { setMobilePanel(null); setMobileCategory(null); if (location.pathname !== '/cart') navigate('/cart'); }} className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 relative focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${location.pathname === '/cart' ? (darkMode ? 'bg-black/40 text-blue-300 font-bold rounded-xl' : 'bg-blue-100 text-blue-600 font-bold rounded-xl') : ''}`}>
           <ShoppingCart size={18} />
           <span className="text-xs mt-1">Cart</span>
           {cart.length > 0 && (

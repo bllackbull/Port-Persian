@@ -134,7 +134,9 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
           </aside>
         </div>
       </div>
-      <Footer darkMode={darkMode} />
+      <div className="hidden md:block">
+        <Footer darkMode={darkMode} />
+      </div>
     </div>
   );
 }
