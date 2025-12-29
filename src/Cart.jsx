@@ -55,7 +55,7 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
               <button aria-label="Back" onClick={() => navigate(-1)} className={`hidden md:inline-flex p-2 rounded-lg border ${darkMode ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-white hover:bg-gray-100 text-black'}`}>
                 <ArrowLeft size={18} />
               </button>
-              <h1 className="text-3xl font-bold">Shopping Cart</h1>
+              <h1 className="text-3xl font-bold hidden md:block">Shopping Cart</h1>
             </div>
           )}
 
@@ -63,14 +63,14 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
           <div />
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6 items-start md:items-stretch">
+        <div className="flex flex-col md:flex-row gap-6 items-stretch">
           <div className={`flex-1 rounded-lg shadow p-4 max-h-[60vh] md:h-[calc(100vh-20rem)] overflow-auto ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
             {loading ? (
               <div className="space-y-4">
                 {Array.from({ length: 4 }).map((_, i) => <SkeletonCartItem key={i} keyProp={i} />)}
               </div>
             ) : cart.length === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center text-gray-500">
+              <div className="w-full h-64 flex flex-col items-center justify-center text-gray-500">
                 <ShoppingCart size={56} className="opacity-40" />
                 <p className="mt-4 text-sm">Your cart is empty.</p>
               </div>
@@ -111,7 +111,7 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
               <>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span>Total Original:</span>
+                    <span>Total Price:</span>
                     <span>${totalOriginal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
@@ -119,7 +119,7 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
                     <span className="text-green-600">-${totalDiscount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-lg font-semibold">Final Total:</span>
+                    <span className="text-lg font-semibold">Final Price:</span>
                     <span className="text-lg font-bold">${finalTotal.toFixed(2)}</span>
                   </div>
                 </div>
