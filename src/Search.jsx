@@ -73,7 +73,7 @@ function SearchPage({ darkMode, setDarkMode, language, setLanguage, cart, setCar
                 key={tag}
                 onClick={() => navigateToSection(tag)}
                 className={`flex items-center px-3 py-2 rounded-full border border-blue-600 text-blue-600 text-sm hover:bg-blue-100 ${
-                  darkMode ? "bg-gray-800 text-blue-300 border-blue-600" : ""
+                  darkMode ? "text-blue-300 border-blue-600" : ""
                 }`}
               >
                 <span className="mr-2">{orderedCategories[tag] && orderedCategories[tag].icon}</span>

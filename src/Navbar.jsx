@@ -140,7 +140,9 @@ export default function Navbar({
           {/* Buttons */}
           <div className="flex items-center space-x-4">
             <button
-              className="md:hidden p-2 rounded-lg border relative z-[60]"
+              className={`md:hidden p-2 rounded-lg border relative z-[60] ${
+                darkMode ? "border-gray-800" : ""
+              }`}
               onClick={() => setMobilePanel("menu")}
               aria-label="Open menu"
             >
@@ -321,23 +323,31 @@ export default function Navbar({
           }`}
           style={{ touchAction: "none", isolation: "isolate" }}
         >
-          <div className="p-4 flex items-center justify-between border-b">
+          <div
+            className={`p-4 flex items-center justify-between border-b ${
+              darkMode ? "border-gray-800" : ""
+            }`}
+          >
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMobilePanel(null)}
-                className="p-2 rounded-lg border"
+                className={`p-2 rounded-lg border ${
+                  darkMode ? "border-gray-800" : ""
+                }`}
                 aria-label="Close menu"
               >
                 <X size={18} />
               </button>
-              <span className="font-bold">Menu</span>
+              <span className="font-bold">Categories</span>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
                   setDarkMode(!darkMode);
                 }}
-                className="p-2 rounded-lg border"
+                className={`p-2 rounded-lg border ${
+                  darkMode ? "border-gray-800" : ""
+                }`}
                 aria-label="Toggle dark mode"
               >
                 {darkMode ? <Sun size={18} /> : <Moon size={18} />}
@@ -346,7 +356,9 @@ export default function Navbar({
                 onClick={() => {
                   setLanguage(language === "EN" ? "FA" : "EN");
                 }}
-                className="p-2 rounded-lg border"
+                className={`p-2 rounded-lg border ${
+                  darkMode ? "border-gray-800" : ""
+                }`}
               >
                 <Globe size={18} />
               </button>
@@ -360,7 +372,6 @@ export default function Navbar({
               style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
             >
               <div className="mt-4">
-                <h3 className="font-semibold mb-2">Categories</h3>
                 <ul className="space-y-2">
                   {Object.entries(orderedCategories)
                     .filter(
@@ -372,7 +383,9 @@ export default function Navbar({
                           onClick={() => {
                             setMobileCategory(cat);
                           }}
-                          className="w-full flex items-center justify-between p-3 rounded border"
+                          className={`w-full flex items-center justify-between p-4 rounded-lg border ${
+                            darkMode ? "border-gray-800" : ""
+                          }`}
                         >
                           <div className="flex items-center">
                             <span className="mr-3">{data.icon}</span>
@@ -426,9 +439,7 @@ export default function Navbar({
                 aria-label="Back"
                 onClick={() => setMobileCategory(null)}
                 className={`p-2 rounded-lg border ${
-                  darkMode
-                    ? "bg-gray-800 hover:bg-gray-700 text-white"
-                    : "bg-white hover:bg-gray-100 text-black"
+                  darkMode ? "border-gray-800" : ""
                 }`}
               >
                 <ArrowLeft size={18} />
@@ -445,8 +456,8 @@ export default function Navbar({
                 (sub, idx) => (
                   <div key={idx} className="mb-3">
                     <div
-                      className={`px-3 py-2 rounded border ${
-                        darkMode ? "border-gray-700" : ""
+                      className={`px-4 py-3 rounded-lg border ${
+                        darkMode ? "border-gray-800" : ""
                       }`}
                     >
                       {sub.name}
@@ -477,7 +488,7 @@ export default function Navbar({
         <div
           className={`${
             darkMode
-              ? "bg-gray-900 text-white border"
+              ? "bg-gray-900 text-white border border-gray-800"
               : "bg-white text-black border"
           } rounded-xl shadow px-2 py-2 flex`}
         >
@@ -536,7 +547,7 @@ export default function Navbar({
           </button>
           <button className="flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300">
             <User size={18} />
-            <span className="text-xs mt-1">Account</span>
+            <span className="text-xs mt-1">Settings</span>
           </button>
         </div>
       </div>
