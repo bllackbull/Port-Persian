@@ -28,10 +28,12 @@ import {
   Gamepad2,
   Check,
 } from "lucide-react";
-import Cart from "./Cart.jsx";
-import Navbar from "./Navbar.jsx";
-import Footer from "./Footer.jsx";
-import SearchPage from "./Search.jsx";
+import Cart from "./pages/Cart.jsx";
+import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
+import SearchPage from "./pages/Search.jsx";
+import Settings from "./pages/Settings.jsx";
+import LanguageSettings from "./pages/LanguageSettings.jsx";
 
 function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, orderedCategories }) {
   const navigate = useNavigate();
@@ -49,19 +51,20 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
   // Reusable skeleton card for product placeholders
   const SkeletonCard = ({ keyProp }) => (
     <div key={keyProp} className={
-      "min-w-[120px] md:min-w-[200px] rounded-xl shadow p-2 md:p-4 flex flex-col justify-between transition h-64 md:h-80 " +
+      "min-w-[120px] md:min-w-[200px] rounded-xl shadow p-2 md:p-4 flex flex-col justify-between transition h-56 md:h-80 " +
       (darkMode ? "bg-gray-800 text-white" : "bg-white text-black")
     }>
       <div className="relative">
-        <div className={"w-full aspect-square rounded-lg mb-4 " + (darkMode ? "bg-gray-700" : "bg-gray-300") + " animate-pulse"} />
+        <div className={"w-full aspect-square rounded-lg mb-3 md:mb-4 " + (darkMode ? "bg-gray-700" : "bg-gray-300") + " animate-pulse"} />
       </div>
-      <div className={"h-2 md:h-4 rounded mb-2 " + (darkMode ? "bg-gray-600" : "bg-gray-200") + " animate-pulse w-3/4"} />
-      <div className={"h-3 md:h-4 rounded mb-4 " + (darkMode ? "bg-gray-600" : "bg-gray-200") + " animate-pulse w-1/2"} />
-      <div className="flex justify-between items-end">
-        <div>
-          <div className={"h-4 md:h-6 w-20 rounded " + (darkMode ? "bg-gray-600" : "bg-gray-300") + " animate-pulse"} />
+      <div className={"h-3 md:h-4 rounded mb-2 " + (darkMode ? "bg-gray-600" : "bg-gray-200") + " animate-pulse w-3/4"} />
+      <div className={"h-3 md:h-4 rounded mb-3 md:mb-4 " + (darkMode ? "bg-gray-600" : "bg-gray-200") + " animate-pulse w-1/2"} />
+      <div className="flex justify-between items-end mt-auto">
+        <div className="flex flex-col justify-end h-[2.75rem] md:h-[3.5rem]">
+          <div className={"h-3 md:h-5 w-20 rounded " + (darkMode ? "bg-gray-600" : "bg-gray-300") + " animate-pulse"} />
+          <div className={"h-3 md:h-4 w-16 rounded mt-1 " + (darkMode ? "bg-gray-600" : "bg-gray-200") + " animate-pulse"} />
         </div>
-        <div className={"h-6 md:h-9 w-16 md:w-20 rounded " + (darkMode ? "bg-gray-700" : "bg-gray-400") + " animate-pulse"} />
+        <div className={"h-6 md:h-8 w-16 md:w-20 rounded " + (darkMode ? "bg-gray-700" : "bg-gray-400") + " animate-pulse"} />
       </div>
     </div>
   );
@@ -104,7 +107,7 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
         <Navbar darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} orderedCategories={orderedCategories} />
 
         {/* Hero Banner */}
-        <div className="pt-24 px-6">
+        <div className="pt-28 md:pt-32 px-6">
           <div className="relative w-full max-w-full mx-auto rounded-2xl overflow-hidden shadow-lg">
             {loading ? (
               <div className={"w-full aspect-[3/1] rounded-2xl " + (darkMode ? "bg-gray-700 animate-pulse" : "bg-gray-300 animate-pulse")} />
@@ -174,21 +177,23 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
                               </span>
                             )}
                           </div>
-                          <h3 className="text-xs md:text-base font-semibold mb-1 truncate">
+                          <h3 className="text-xs md:text-base font-semibold mb-1 truncate min-h-[2rem] md:min-h-[2.5rem]">
                             {item.name}
                           </h3>
-                          <div className="flex justify-between items-end min-h-[2rem] md:min-h-[3rem]">
-                            <div>
+                          <div className="flex justify-between items-end">
+                            <div className="flex flex-col justify-end h-[3.25rem] md:h-[3.75rem]">
                               <p className={`text-base md:text-lg font-bold ${item.discount ? 'text-red-500' : ''}`}>
                                 ${item.price}
                               </p>
-                              {item.discount && (
-                                <p className="text-sm text-gray-500 line-through">${item.originalPrice}</p>
+                              {item.discount ? (
+                                <p className="text-xs md:text-sm text-gray-500 line-through">${item.originalPrice}</p>
+                              ) : (
+                                <p className="text-xs md:text-sm text-transparent">placeholder</p>
                               )}
                             </div>
                             <button
                               onClick={() => addToCart(item)}
-                              className={`px-3 py-1 md:px-4 md:py-2 rounded transition ${item.id === addedItemId ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                              className={`self-end px-3 py-1 md:px-4 md:py-2 rounded transition ${item.id === addedItemId ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
                               {item.id === addedItemId ? (
                                 <Check size={18} className={darkMode ? "" : "text-white"} />
@@ -223,6 +228,14 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState("EN");
   const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
 
   const orderedCategories = useMemo(() => {
     const categories = {};
@@ -389,6 +402,8 @@ export default function App() {
         <Route path="/" element={<Home key="home" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} setCart={setCart} orderedCategories={orderedCategories} />} />
         <Route path="/search" element={<SearchPage key="search" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} setCart={setCart} orderedCategories={orderedCategories} />} />
         <Route path="/cart" element={<Cart key="cart" cart={cart} setCart={setCart} darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} orderedCategories={orderedCategories} />} />
+        <Route path="/settings" element={<Settings key="settings" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} orderedCategories={orderedCategories} />} />
+        <Route path="/settings/language" element={<LanguageSettings key="language" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} orderedCategories={orderedCategories} />} />
       </Routes>
     </Router>
   );

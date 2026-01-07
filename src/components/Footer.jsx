@@ -11,7 +11,16 @@ export default function Footer({ darkMode }) {
       <div className="max-w-6xl mx-auto px-4 relative">
         <h2 onClick={() => navigate('/')} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-bold cursor-pointer">My Shop</h2>
         <div className="flex items-center justify-end">
-          <button onClick={scrollToTop} aria-label="Back to top" title="Back to top" className={`p-2 rounded-lg border ${darkMode ? 'hover:bg-gray-800 text-white' : 'hover:bg-gray-100 text-black'}`}>
+          <button
+            onClick={scrollToTop}
+            aria-label="Back to top"
+            title="Back to top"
+            className={`p-3 rounded-xl border text-base ${
+              darkMode
+                ? 'border-gray-700 bg-gray-800 hover:bg-gray-700 text-white'
+                : 'border-gray-200 bg-gray-100 hover:bg-gray-200 text-black'
+            }`}
+          >
             <ChevronUp size={20} />
           </button>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -33,6 +33,18 @@ export default function Navbar({
   const closeTimeoutRef = useRef(null);
   const categoriesRef = useRef(null);
   const scrollLockRef = useRef(0);
+
+  const scrollToCategoryButton = useCallback((cat) => {
+    const catId = cat.replace(/\s+/g, "-").toLowerCase();
+    requestAnimationFrame(() => {
+      const btn = document.getElementById(`mobile-cat-${catId}`);
+      const container = categoriesRef.current;
+      if (btn && container) {
+        const offset = btn.offsetTop - container.offsetTop;
+        container.scrollTo({ top: Math.max(offset - 8, 0), behavior: "auto" });
+      }
+    });
+  }, []);
 
   const navigateToSection = (cat) => {
     const id = cat.replace(/\s+/g, "-").toLowerCase();
@@ -323,11 +335,7 @@ export default function Navbar({
           }`}
           style={{ touchAction: "none", isolation: "isolate" }}
         >
-          <div
-            className={`p-4 flex items-center justify-between border-b ${
-              darkMode ? "border-gray-800" : ""
-            }`}
-          >
+          <div className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMobilePanel(null)}
@@ -377,29 +385,83 @@ export default function Navbar({
                     .filter(
                       ([cat]) => cat !== "Hot Deals" && cat !== "Most Popular"
                     )
-                    .map(([cat, data]) => (
-                      <li key={cat}>
-                        <button
-                          onClick={() => {
-                            setMobileCategory(cat);
-                          }}
-                          className={`w-full flex items-center justify-between p-4 rounded-lg border ${
-                            darkMode ? "border-gray-800" : ""
-                          }`}
-                        >
-                          <div className="flex items-center">
-                            <span className="mr-3">{data.icon}</span>
-                            <span>{cat}</span>
-                          </div>
-                          <ChevronRight size={16} />
-                        </button>
-                      </li>
-                    ))}
+                    .map(([cat, data]) => {
+                      const isOpen = mobileCategory === cat;
+                      const catId = cat.replace(/\s+/g, "-").toLowerCase();
+                      return (
+                        <li key={cat}>
+                          <button
+                            id={`mobile-cat-${catId}`}
+                            aria-expanded={isOpen}
+                            onClick={() => {
+                              setMobileCategory((prev) => {
+                                const next = prev === cat ? null : cat;
+                                if (next) scrollToCategoryButton(next);
+                                return next;
+                              });
+                            }}
+                            className={`w-full flex items-center justify-between p-4 rounded-lg border ${
+                              darkMode ? "border-gray-800" : "border-gray-200"
+                            } ${
+                              isOpen
+                                ? darkMode
+                                  ? "bg-black/40 text-blue-300 font-bold"
+                                  : "bg-blue-100 text-blue-600 font-bold"
+                                : ""
+                            }`}
+                          >
+                            <div className="flex items-center">
+                              <span className="mr-3">{data.icon}</span>
+                              <span>{cat}</span>
+                            </div>
+                            <ChevronDown
+                              size={16}
+                              className={`${isOpen ? "rotate-180" : ""} transition-transform`}
+                            />
+                          </button>
+                          {isOpen && (
+                            <div className="mt-2 space-y-2 pl-2">
+                              {Array.isArray(data.subcategories) &&
+                                data.subcategories.map((sub) => (
+                                  <div
+                                    key={sub.name}
+                                    className={`rounded-lg border ${
+                                      darkMode ? "border-gray-800" : "border-gray-200"
+                                    }`}
+                                  >
+                                    <button
+                                      className={`w-full text-left px-3 py-2 font-semibold ${
+                                        darkMode ? "text-white" : "text-black"
+                                      }`}
+                                      onClick={() => navigateToSection(cat)}
+                                    >
+                                      {sub.name}
+                                    </button>
+                                    {Array.isArray(sub.subsubs) && (
+                                      <div className="px-3 pb-2 space-y-1">
+                                        {sub.subsubs.map((s) => (
+                                          <button
+                                            key={s}
+                                            className="w-full text-left text-sm px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                                            onClick={() => navigateToSection(cat)}
+                                          >
+                                            {s}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
                 </ul>
               </div>
             </div>
 
-            <div className="p-4 border-t flex items-center justify-between">
+            <div className="p-4 flex items-center justify-between">
               <div />
               <div className="flex items-center gap-2">
                 <button
@@ -421,65 +483,6 @@ export default function Navbar({
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile category overlay (layers above tab bar) - moved out so it can appear above tabs */}
-      {mobileCategory && (
-        <div
-          className={`fixed inset-0 z-[100000] md:hidden ${
-            darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
-          } p-4`}
-          style={{ isolation: "isolate" }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <button
-                aria-label="Back"
-                onClick={() => setMobileCategory(null)}
-                className={`p-2 rounded-lg border ${
-                  darkMode ? "border-gray-800" : ""
-                }`}
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <h3 className="font-bold">{mobileCategory}</h3>
-            </div>
-            <div />
-          </div>
-          <div className="overflow-y-auto">
-            {orderedCategories &&
-            orderedCategories[mobileCategory] &&
-            Array.isArray(orderedCategories[mobileCategory].subcategories) ? (
-              orderedCategories[mobileCategory].subcategories.map(
-                (sub, idx) => (
-                  <div key={idx} className="mb-3">
-                    <div
-                      className={`px-4 py-3 rounded-lg border ${
-                        darkMode ? "border-gray-800" : ""
-                      }`}
-                    >
-                      {sub.name}
-                    </div>
-                    <div className="ml-4 mt-2 space-y-1">
-                      {Array.isArray(sub.subsubs)
-                        ? sub.subsubs.map((s) => (
-                            <button
-                              key={s}
-                              className="w-full text-left text-sm p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                            >
-                              {s}
-                            </button>
-                          ))
-                        : null}
-                    </div>
-                  </div>
-                )
-              )
-            ) : (
-              <div className="text-sm text-gray-500">No categories found.</div>
-            )}
           </div>
         </div>
       )}

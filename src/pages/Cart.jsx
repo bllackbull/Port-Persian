@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, CreditCard, Instagram, Twitter, Youtube, Trash2 } from 'lucide-react';
-import Navbar from './Navbar.jsx';
-import Footer from './Footer.jsx';
+import { ShoppingCart, ChevronLeft, CreditCard, Instagram, Twitter, Youtube, Trash2 } from 'lucide-react';
+import Navbar from '../components/Navbar.jsx';
+import Footer from '../components/Footer.jsx';
 
 export default function Cart({ cart, setCart, darkMode, setDarkMode, language, setLanguage, orderedCategories }) {
   const navigate = useNavigate();
@@ -28,14 +28,14 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
 
   const SkeletonCartItem = ({ keyProp }) => (
     <div key={keyProp} className={`flex items-center justify-between p-3 md:p-4 rounded-lg ${darkMode ? 'bg-gray-900 border-gray-700' : 'border bg-white'}`}>
-      <div className="flex items-center space-x-3 md:space-x-4">
+      <div className="flex items-center space-x-3 md:space-x-4 w-full">
         <div className={`w-12 h-12 md:w-16 md:h-16 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`} />
-        <div>
-          <div className={`h-4 rounded mb-2 ${darkMode ? 'bg-gray-600' : 'bg-gray-200'} animate-pulse w-40`} />
-          <div className={`h-3 rounded ${darkMode ? 'bg-gray-600' : 'bg-gray-200'} animate-pulse w-28`} />
+        <div className="flex-1">
+          <div className={`h-4 rounded mb-2 ${darkMode ? 'bg-gray-600' : 'bg-gray-200'} animate-pulse w-32 md:w-40`} />
+          <div className={`h-3 rounded ${darkMode ? 'bg-gray-600' : 'bg-gray-200'} animate-pulse w-24 md:w-28`} />
         </div>
+        <div className={`h-6 w-16 md:w-20 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-400'} animate-pulse`} />
       </div>
-      <div className={`h-6 w-20 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-400'} animate-pulse`} />
     </div>
   );
 
@@ -43,17 +43,17 @@ export default function Cart({ cart, setCart, darkMode, setDarkMode, language, s
     <div className={`min-h-screen flex flex-col overflow-hidden ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} orderedCategories={orderedCategories} />
 
-      <div className="flex-1 pt-24 md:pt-36 px-4 md:px-6 overflow-hidden">
+      <div className="flex-1 pt-28 md:pt-40 px-4 md:px-6 overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           {loading ? (
-            <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4">
               <div className={`w-10 h-10 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} animate-pulse`} />
               <div className={`h-8 w-56 rounded ${darkMode ? 'bg-gray-600' : 'bg-gray-200'} animate-pulse`} />
             </div>
           ) : (
             <div className="flex items-center gap-4">
               <button aria-label="Back" onClick={() => navigate(-1)} className={`hidden md:inline-flex p-2 rounded-lg border ${darkMode ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-white hover:bg-gray-100 text-black'}`}>
-                <ArrowLeft size={18} />
+                <ChevronLeft size={18} />
               </button>
               <h1 className="text-3xl font-bold hidden md:block">Shopping Cart</h1>
             </div>

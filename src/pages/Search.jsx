@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
-import Navbar from "./Navbar.jsx";
-import Footer from "./Footer.jsx";
+import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 
 function SearchPage({ darkMode, setDarkMode, language, setLanguage, cart, setCart, orderedCategories }) {
   const navigate = useNavigate();
@@ -42,8 +42,8 @@ function SearchPage({ darkMode, setDarkMode, language, setLanguage, cart, setCar
       <div
         className={
           darkMode
-            ? "min-h-screen bg-gray-900 text-white pb-20 pt-16"
-            : "min-h-screen bg-gray-100 text-black pb-20 pt-16"
+            ? "min-h-screen bg-gray-900 text-white pb-20 pt-20 md:pt-28"
+            : "min-h-screen bg-gray-100 text-black pb-20 pt-20 md:pt-28"
         }
       >
         {/* Header */}
