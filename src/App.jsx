@@ -34,6 +34,7 @@ import Footer from "./components/Footer.jsx";
 import SearchPage from "./pages/Search.jsx";
 import Settings from "./pages/Settings.jsx";
 import LanguageSettings from "./pages/LanguageSettings.jsx";
+import ProductDetail from "./pages/products/ProductDetail.jsx";
 
 function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, orderedCategories }) {
   const navigate = useNavigate();
@@ -149,7 +150,7 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
                     Show More <ChevronRight size={16} className="ml-1" />
                   </button>
                 </div>
-                <div className="flex overflow-x-auto space-x-4 pb-2 scrollbar-custom">
+                <div className="flex overflow-x-auto space-x-4 pb-2 py-2 scrollbar-custom">
                   {loading ? (
                     Array.from({ length: (data.items && data.items.length) || 8 }).map((_, i) => <SkeletonCard key={i} keyProp={i} />)
                   ) : (
@@ -157,8 +158,9 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
                       return (
                         <div
                           key={item.id}
+                          onClick={() => navigate(`/product/${item.id}`)}
                           className={
-                            "min-w-[120px] md:min-w-[200px] rounded-xl shadow p-2 md:p-4 flex flex-col justify-between transition h-56 md:h-80 " +
+                            "min-w-[120px] md:min-w-[200px] rounded-xl shadow p-2 md:p-4 flex flex-col justify-between transition h-56 md:h-80 cursor-pointer hover:scale-105 " +
                             (darkMode
                               ? "bg-gray-800 text-white"
                               : "bg-white text-black")
@@ -170,7 +172,15 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
                                 "w-full aspect-square rounded-lg mb-4 " +
                                 (darkMode ? "bg-gray-700" : "bg-gray-300")
                               }
-                            />
+                            >
+                              {item.image && (
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              )}
+                            </div>
                             {item.discount && (
                               <span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
                                 -{item.discount}%
@@ -192,7 +202,10 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
                               )}
                             </div>
                             <button
-                              onClick={() => addToCart(item)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToCart(item);
+                              }}
                               className={`self-end px-3 py-1 md:px-4 md:py-2 rounded transition ${item.id === addedItemId ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
                               {item.id === addedItemId ? (
@@ -369,6 +382,23 @@ export default function App() {
       categories[cat] = data;
     });
 
+    // Add pearl necklace to Jewelry category
+    if (categories["Jewelry"]) {
+      const pearlNecklace = {
+        id: 999,
+        name: "Pearl Necklace",
+        price: 89.99,
+        originalPrice: 89.99,
+        discount: null,
+        image: "/images/IMG_0493.PNG",
+        color: "Pink",
+        category: "Jewelry",
+        subcategory: "Necklaces",
+        type: "Pearl"
+      };
+      categories["Jewelry"].items.unshift(pearlNecklace);
+    }
+
     // Most Popular: select items from other categories
     const mostPopularItems = [];
     Object.values(categories).forEach(catData => {
@@ -404,6 +434,7 @@ export default function App() {
         <Route path="/cart" element={<Cart key="cart" cart={cart} setCart={setCart} darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} orderedCategories={orderedCategories} />} />
         <Route path="/settings" element={<Settings key="settings" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} orderedCategories={orderedCategories} />} />
         <Route path="/settings/language" element={<LanguageSettings key="language" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} orderedCategories={orderedCategories} />} />
+        <Route path="/product/:id" element={<ProductDetail key="product" darkMode={darkMode} setDarkMode={setDarkMode} language={language} setLanguage={setLanguage} cart={cart} setCart={setCart} orderedCategories={orderedCategories} />} />
       </Routes>
     </Router>
   );

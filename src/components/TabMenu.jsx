@@ -21,7 +21,7 @@ export default function TabMenu({ darkMode, cart, setMobilePanel, setMobileCateg
             navigate("/");
           }}
           className={`flex-1 flex flex-col items-center justify-center text-sm py-2 px-2 focus:outline-none focus-visible:text-blue-600 dark:focus-visible:text-blue-300 ${
-            location.pathname === "/"
+            location.pathname === "/" || location.pathname.startsWith("/product/")
               ? darkMode
                 ? "bg-black/40 text-blue-300 font-bold rounded-xl"
                 : "bg-blue-100 text-blue-600 font-bold rounded-xl"

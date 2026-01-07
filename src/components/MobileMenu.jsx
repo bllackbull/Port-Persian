@@ -153,7 +153,7 @@ export default function MobileMenu({
                                 <div
                                   key={sub.name}
                                   className={`rounded-lg border ${
-                                    darkMode ? "border-gray-700 bg-gray-700" : "border-gray-200 bg-white"
+                                    darkMode ? "border-gray-700 bg-gray-700" : "border-gray-200 bg-gray-50"
                                   }`}
                                 >
                                   <button
