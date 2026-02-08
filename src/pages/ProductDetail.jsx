@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronRight, ShoppingCart, Star, Heart, Share2, Check, Minus, Plus, Sparkles } from "lucide-react";
-import Navbar from "../../components/Navbar.jsx";
-import Footer from "../../components/Footer.jsx";
+import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 
 export default function ProductDetail({ darkMode, setDarkMode, language, setLanguage, cart, setCart, orderedCategories }) {
   const { id } = useParams();
@@ -92,7 +92,7 @@ export default function ProductDetail({ darkMode, setDarkMode, language, setLang
       </>
     );
   }
-
+  
   if (!product) {
     return (
       <>

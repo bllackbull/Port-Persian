@@ -95,7 +95,8 @@ export default function Navbar({
             >
               <Menu size={22} />
             </button>
-            {/* Cart first, then Settings to make Settings the rightmost */}
+
+            {/* Shopping Cart */}
             <button
               className={`hidden md:inline relative p-3 rounded-xl border text-base ${
                 darkMode ? "border-gray-700 bg-gray-800 hover:bg-gray-700" : "border-gray-200 bg-gray-100 hover:bg-gray-200"
@@ -113,6 +114,7 @@ export default function Navbar({
               )}
             </button>
 
+            {/* Settings */}
             <div className="hidden md:block relative" ref={userMenuRef}>
               <button
                 ref={userButtonRef}
@@ -231,7 +233,7 @@ export default function Navbar({
                         className={`w-full flex items-center justify-between px-4 py-3 ${
                           darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
                         }`}
-                        onClick={() => navigate("/settings")}
+                        onClick={() => {}}
                       >
                         <span className="flex items-center gap-3">
                           <Bell size={18} />
@@ -253,7 +255,7 @@ export default function Navbar({
                           className={`w-full flex items-center justify-between px-4 py-3 ${
                             darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
                           }`}
-                          onClick={() => navigate("/settings")}
+                          onClick={() => {}}
                         >
                           <span className="flex items-center gap-3">
                             <Icon size={18} />

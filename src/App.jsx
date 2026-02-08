@@ -34,7 +34,7 @@ import Footer from "./components/Footer.jsx";
 import SearchPage from "./pages/Search.jsx";
 import Settings from "./pages/Settings.jsx";
 import LanguageSettings from "./pages/LanguageSettings.jsx";
-import ProductDetail from "./pages/products/ProductDetail.jsx";
+import ProductDetail from "./pages/ProductDetail.jsx";
 
 function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, orderedCategories }) {
   const navigate = useNavigate();
@@ -122,14 +122,14 @@ function Home({ darkMode, setDarkMode, language, setLanguage, cart, setCart, ord
 
             <button
               onClick={prevBanner}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/40 rounded-full"
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/40 rounded-full hidden md:block"
             >
               <ChevronLeft size={24} className="text-white" />
             </button>
 
             <button
               onClick={nextBanner}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/40 rounded-full"
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/40 rounded-full hidden md:block"
             >
               <ChevronRight size={24} className="text-white" />
             </button>

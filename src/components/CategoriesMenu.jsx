@@ -25,7 +25,7 @@ export default function CategoriesMenu({ darkMode, orderedCategories }) {
             darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
           }`}
         >
-          <Menu size={20} className="mr-2" /> All Categories{" "}
+          <Menu size={20} className="mr-2" /> Categories{" "}
           <ChevronDown size={16} className="ml-1" />
         </button>
         {/* Dropdown on hover */}

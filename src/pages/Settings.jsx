@@ -39,8 +39,8 @@ export default function Settings({ darkMode, setDarkMode, language, setLanguage,
       <div
         className={
           darkMode
-            ? "min-h-screen bg-gray-900 text-white pb-20 pt-26 md:pt-32 px-4 md:px-6"
-            : "min-h-screen bg-white text-black pb-20 pt-26 md:pt-32 px-4 md:px-6"
+            ? "min-h-screen bg-gray-900 text-white pb-20 pt-24 md:pt-32 px-4 md:px-6"
+            : "min-h-screen bg-white text-black pb-20 pt-24 md:pt-32 px-4 md:px-6"
         }
       >
         <div className="max-w-2xl mx-auto">
